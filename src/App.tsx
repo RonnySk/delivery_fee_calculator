@@ -1,98 +1,33 @@
 import "./App.css";
 
+import { useState } from "react";
 import { Button, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 
-import { useEffect, useState } from "react";
-
 function App() {
+  const [dateTime, setdateTime] = useState(new Date());
+
   const [cartValue, setCartValue] = useState(0);
   const [deliveryDistance, setDeliveryDistance] = useState(0);
   const [items, setItems] = useState(0);
-  const [dateTime, setdateTime] = useState("");
-  const [dayofWeek, setDayofWeek] = useState(0);
-  const [hour, setHour] = useState(0);
-  const [finalDeliveryFeePrice, setFinalDeliveryFeePrice] = useState("0");
-
-  useEffect(() => {
-    return () => {
-      const currentBrowserDateTime = new Date();
-      const currentDayofWeek = currentBrowserDateTime.getDay();
-      const currentDay =
-        currentBrowserDateTime.getDay() +
-        "/" +
-        (currentBrowserDateTime.getMonth() + 1) +
-        "/" +
-        currentBrowserDateTime.getFullYear();
-
-      const currentHour = currentBrowserDateTime.getHours();
-
-      const currentMinutes = currentBrowserDateTime.getMinutes();
-
-      setDayofWeek(currentDayofWeek);
-      setHour(currentHour);
-      setdateTime(currentDay + " " + currentHour + ":" + currentMinutes);
-    };
-  }, []);
-
-  const handleCartValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCartValue(parseFloat(e.target.value));
-  };
-
-  const handleDeliveryDistance = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDeliveryDistance(parseFloat(e.target.value));
-  };
-
-  const handleItems = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setItems(parseFloat(e.target.value));
-  };
+  const [finalDeliveryFeePrice, setFinalDeliveryFeePrice] = useState<number>();
 
   function handleDeliveryFee() {
-    let deliveryFeePrice = 0;
-    let underTenFee = 0;
-    let baseDeliveryFee = 2;
-
-    if (cartValue >= 200) {
-      deliveryFeePrice = 0;
-      return setFinalDeliveryFeePrice("Free Delivery Fee!");
-    } else {
-      if (cartValue >= 0.01 && cartValue < 10) {
-        underTenFee = Number((10 - cartValue).toFixed(2));
-        deliveryFeePrice += underTenFee;
-      }
-
-      if (deliveryDistance >= 1001) {
-        const additionalMeters = Math.ceil((deliveryDistance - 1000) / 500);
-        deliveryFeePrice += additionalMeters + baseDeliveryFee;
-      } else {
-        deliveryFeePrice += baseDeliveryFee;
-      }
-
-      if (items > 4) {
-        let itemsFee = (items - 4) * 0.5;
-        deliveryFeePrice += itemsFee;
-      }
-      if (items > 12) {
-        deliveryFeePrice += 1.2;
-      }
-
-      if (dayofWeek === 5 && hour >= 15 && hour <= 19) {
-        deliveryFeePrice *= 1.2;
-      }
-
-      if (deliveryFeePrice >= 15) {
-        deliveryFeePrice = 15;
-      }
-    }
-
-    return setFinalDeliveryFeePrice(deliveryFeePrice.toFixed(2) + "$");
+    setFinalDeliveryFeePrice(
+      getDeliveryFee({
+        cartValue,
+        deliveryDistance,
+        items,
+        dateTime,
+      })
+    );
   }
 
   function handleClearCalculator() {
     setCartValue(0);
     setDeliveryDistance(0);
     setItems(0);
-    setFinalDeliveryFeePrice("0");
+    setFinalDeliveryFeePrice(0);
   }
 
   return (
@@ -129,8 +64,8 @@ function App() {
           value={cartValue}
           variant="outlined"
           margin="normal"
-          onChange={handleCartValue}
-        ></TextField>
+          onChange={(event) => setCartValue(parseFloat(event.target.value))}
+        />
         <TextField
           data-test-id="deliveryDistance"
           id="outlined-basic"
@@ -139,8 +74,10 @@ function App() {
           value={deliveryDistance}
           variant="outlined"
           margin="normal"
-          onChange={handleDeliveryDistance}
-        ></TextField>
+          onChange={(event) =>
+            setDeliveryDistance(parseFloat(event.target.value))
+          }
+        />
         <TextField
           data-test-id="numberOfItems"
           id="outlined-basic"
@@ -149,8 +86,14 @@ function App() {
           value={items}
           variant="outlined"
           margin="normal"
-          onChange={handleItems}
-        ></TextField>
+          onChange={(event) => setItems(parseFloat(event.target.value))}
+        />
+        {/* https://mui.com/x/react-date-pickers/date-time-picker/ */}
+        {/* <DateTimePicker
+          label="Controlled picker"
+          value={dateTime}
+          onChange={(newValue) => setdateTime(newValue)}
+        /> */}
         <TextField
           data-test-id="orderTime"
           id="outlined-basic"
@@ -160,14 +103,68 @@ function App() {
           variant="outlined"
           margin="normal"
           disabled
-        ></TextField>
+        />
 
         <Button onClick={handleDeliveryFee}>Calculate delivery price</Button>
         <Button onClick={handleClearCalculator}>Clear Calculator</Button>
-        <Typography>Delivery price: {finalDeliveryFeePrice}</Typography>
+        {!!finalDeliveryFeePrice && (
+          <Typography>Delivery price: {finalDeliveryFeePrice} $</Typography>
+        )}
+        {finalDeliveryFeePrice === 0 && (
+          <Typography>Free Delivery Fee!</Typography>
+        )}
       </Box>
     </Box>
   );
 }
 
 export default App;
+
+// colocar em outro arquivo dentro da past helpers
+function getDeliveryFee(args: {
+  cartValue: number;
+  deliveryDistance: number;
+  items: number;
+  dateTime: Date;
+}) {
+  const { cartValue, dateTime, deliveryDistance, items } = args;
+  let deliveryFeePrice = 2;
+  let underTenFee = 0;
+
+  if (cartValue >= 200) {
+    return 0;
+  }
+
+  if (cartValue >= 0.01 && cartValue < 10) {
+    underTenFee = Number((10 - cartValue).toFixed(2));
+    deliveryFeePrice += underTenFee;
+  }
+
+  if (deliveryDistance >= 1001) {
+    const additionalMeters = Math.ceil((deliveryDistance - 1000) / 500);
+    deliveryFeePrice += additionalMeters;
+  }
+
+  if (items > 4) {
+    let itemsFee = (items - 4) * 0.5;
+    deliveryFeePrice += itemsFee;
+  }
+
+  if (items > 12) {
+    deliveryFeePrice += 1.2;
+  }
+
+  if (
+    dateTime.getDay() === 5 &&
+    dateTime.getHours() >= 15 &&
+    dateTime.getHours() <= 19
+  ) {
+    deliveryFeePrice *= 1.2;
+  }
+
+  if (deliveryFeePrice >= 15) {
+    deliveryFeePrice = 15;
+  }
+
+  return Number(deliveryFeePrice.toFixed(2));
+}
