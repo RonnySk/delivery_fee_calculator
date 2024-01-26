@@ -56,7 +56,6 @@ function App() {
       deliveryFeePrice = 0;
       return setFinalDeliveryFeePrice("Free Delivery Fee!");
     } else {
-      //
       if (cartValue >= 0.01 && cartValue < 10) {
         underTenFee = Number((10 - cartValue).toFixed(2));
         deliveryFeePrice += underTenFee;
