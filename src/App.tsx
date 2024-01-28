@@ -47,7 +47,7 @@ function App() {
       justifyContent="center"
       alignItems="center"
     >
-      <img src={logo} style={{ width: 250, marginTop: 30 }} />
+      <img src={logo} style={{ width: 250 }} />
 
       <Typography variant="h1" color="#ffffff" m={4} fontSize={30}>
         Delivery Fee Calculator
