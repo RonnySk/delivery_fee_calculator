@@ -10,6 +10,7 @@ import { Box } from "@mui/system";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
+import logo from "./images/wolt_logo.png";
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { getDeliveryFee } from "./helpers/getDeliveryFee";
@@ -46,7 +47,9 @@ function App() {
       justifyContent="center"
       alignItems="center"
     >
-      <Typography variant="h4" color="#ffffff" m={4}>
+      <img src={logo} style={{ width: 250, marginTop: 30 }} />
+
+      <Typography variant="h1" color="#ffffff" m={4} fontSize={30}>
         Delivery Fee Calculator
       </Typography>
 
