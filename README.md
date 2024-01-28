@@ -29,4 +29,4 @@ Linkedin: www.linkedin.com/in/ronny-skaraboto
 
 GitHub: www.github.com/RonnySk
 
-Portfolio: www.ronny-skaraboto-portfolio.vercel.app
+Portfolio: https://ronny-skaraboto-portfolio.vercel.app
