@@ -24,4 +24,6 @@ run `npm test` on your terminal
 ## Author
 
 Ronny Skaraboto
-Linkedin: www.linkedin.com/in/ronny-skaraboto
+Linkedin: linkedin.com/in/ronny-skaraboto
+GitHub: github.com/RonnySk
+Portfolio: ronny-skaraboto-portfolio.vercel.app
