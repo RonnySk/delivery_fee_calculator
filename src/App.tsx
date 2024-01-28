@@ -3,96 +3,34 @@ import "./App.css";
 import { Button, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
+import React from "react";
+
+import { getDeliveryFee } from "./helpers/getDeliveryFee";
 
 function App() {
   const [cartValue, setCartValue] = useState(0);
   const [deliveryDistance, setDeliveryDistance] = useState(0);
   const [items, setItems] = useState(0);
-  const [dateTime, setdateTime] = useState("");
-  const [dayofWeek, setDayofWeek] = useState(0);
-  const [hour, setHour] = useState(0);
-  const [finalDeliveryFeePrice, setFinalDeliveryFeePrice] = useState("0");
-
-  useEffect(() => {
-    return () => {
-      const currentBrowserDateTime = new Date();
-      const currentDayofWeek = currentBrowserDateTime.getDay();
-      const currentDay =
-        currentBrowserDateTime.getDay() +
-        "/" +
-        (currentBrowserDateTime.getMonth() + 1) +
-        "/" +
-        currentBrowserDateTime.getFullYear();
-
-      const currentHour = currentBrowserDateTime.getHours();
-
-      const currentMinutes = currentBrowserDateTime.getMinutes();
-
-      setDayofWeek(currentDayofWeek);
-      setHour(currentHour);
-      setdateTime(currentDay + " " + currentHour + ":" + currentMinutes);
-    };
-  }, []);
-
-  const handleCartValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCartValue(parseFloat(e.target.value));
-  };
-
-  const handleDeliveryDistance = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDeliveryDistance(parseFloat(e.target.value));
-  };
-
-  const handleItems = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setItems(parseFloat(e.target.value));
-  };
+  const [pickerDateTime, setPickerDateTime] = React.useState<Dayjs | null>(
+    dayjs()
+  );
+  const [finalDeliveryFeePrice, setFinalDeliveryFeePrice] = useState<number>();
 
   function handleDeliveryFee() {
-    let deliveryFeePrice = 0;
-    let underTenFee = 0;
-    let baseDeliveryFee = 2;
-
-    if (cartValue >= 200) {
-      deliveryFeePrice = 0;
-      return setFinalDeliveryFeePrice("Free Delivery Fee!");
-    } else {
-      if (cartValue >= 0.01 && cartValue < 10) {
-        underTenFee = Number((10 - cartValue).toFixed(2));
-        deliveryFeePrice += underTenFee;
-      }
-
-      if (deliveryDistance >= 1001) {
-        const additionalMeters = Math.ceil((deliveryDistance - 1000) / 500);
-        deliveryFeePrice += additionalMeters + baseDeliveryFee;
-      } else {
-        deliveryFeePrice += baseDeliveryFee;
-      }
-
-      if (items > 4) {
-        let itemsFee = (items - 4) * 0.5;
-        deliveryFeePrice += itemsFee;
-      }
-      if (items > 12) {
-        deliveryFeePrice += 1.2;
-      }
-
-      if (dayofWeek === 5 && hour >= 15 && hour <= 19) {
-        deliveryFeePrice *= 1.2;
-      }
-
-      if (deliveryFeePrice >= 15) {
-        deliveryFeePrice = 15;
-      }
-    }
-
-    return setFinalDeliveryFeePrice(deliveryFeePrice.toFixed(2) + "$");
+    setFinalDeliveryFeePrice(
+      getDeliveryFee({ cartValue, deliveryDistance, items, pickerDateTime })
+    );
   }
 
   function handleClearCalculator() {
     setCartValue(0);
     setDeliveryDistance(0);
     setItems(0);
-    setFinalDeliveryFeePrice("0");
+    setFinalDeliveryFeePrice(undefined);
   }
 
   return (
@@ -129,8 +67,8 @@ function App() {
           value={cartValue}
           variant="outlined"
           margin="normal"
-          onChange={handleCartValue}
-        ></TextField>
+          onChange={(event) => setCartValue(parseFloat(event.target.value))}
+        />
         <TextField
           data-test-id="deliveryDistance"
           id="outlined-basic"
@@ -139,8 +77,10 @@ function App() {
           value={deliveryDistance}
           variant="outlined"
           margin="normal"
-          onChange={handleDeliveryDistance}
-        ></TextField>
+          onChange={(event) =>
+            setDeliveryDistance(parseInt(event.target.value))
+          }
+        />
         <TextField
           data-test-id="numberOfItems"
           id="outlined-basic"
@@ -149,22 +89,26 @@ function App() {
           value={items}
           variant="outlined"
           margin="normal"
-          onChange={handleItems}
-        ></TextField>
-        <TextField
-          data-test-id="orderTime"
-          id="outlined-basic"
-          type="text"
-          label="Order Time"
-          value={dateTime}
-          variant="outlined"
-          margin="normal"
-          disabled
-        ></TextField>
+          onChange={(event) => setItems(parseInt(event.target.value))}
+        />
+
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateTimePicker
+            value={pickerDateTime}
+            onChange={(newDateTime) => setPickerDateTime(newDateTime)}
+          />
+        </LocalizationProvider>
 
         <Button onClick={handleDeliveryFee}>Calculate delivery price</Button>
         <Button onClick={handleClearCalculator}>Clear Calculator</Button>
-        <Typography>Delivery price: {finalDeliveryFeePrice}</Typography>
+        {!!finalDeliveryFeePrice && (
+          <Typography data-test-id="fee">
+            Delivery price: {finalDeliveryFeePrice}$
+          </Typography>
+        )}
+        {finalDeliveryFeePrice === 0 && (
+          <Typography>Free Delivery Fee!</Typography>
+        )}
       </Box>
     </Box>
   );
