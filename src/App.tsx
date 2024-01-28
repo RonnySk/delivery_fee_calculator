@@ -1,23 +1,24 @@
-import "./App.css";
-
-import { Button, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
-
-import { useState } from "react";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "dayjs";
-import React from "react";
 
+import { useState } from "react";
+import dayjs, { Dayjs } from "dayjs";
 import { getDeliveryFee } from "./helpers/getDeliveryFee";
 
 function App() {
   const [cartValue, setCartValue] = useState(0);
   const [deliveryDistance, setDeliveryDistance] = useState(0);
   const [items, setItems] = useState(0);
-  const [pickerDateTime, setPickerDateTime] = React.useState<Dayjs | null>(
-    dayjs()
-  );
+  const [pickerDateTime, setPickerDateTime] = useState<Dayjs | null>(dayjs());
   const [finalDeliveryFeePrice, setFinalDeliveryFeePrice] = useState<number>();
 
   function handleDeliveryFee() {
@@ -33,6 +34,8 @@ function App() {
     setFinalDeliveryFeePrice(undefined);
   }
 
+  console.log("final delivery fee", finalDeliveryFeePrice);
+
   return (
     <Box
       bgcolor="#00c2e8"
@@ -43,14 +46,12 @@ function App() {
       justifyContent="center"
       alignItems="center"
     >
-      <Typography variant="h4" color="#ffffff" mb={4}>
+      <Typography variant="h4" color="#ffffff" m={4}>
         Delivery Fee Calculator
       </Typography>
 
       <Box
         bgcolor="#ffffff"
-        width="50vw"
-        height="80vh"
         display="flex"
         flexDirection="column"
         justifyContent="center"
@@ -58,50 +59,79 @@ function App() {
         border={1}
         borderColor="#ffffff"
         borderRadius={4}
+        p={6}
+        gap={3}
       >
-        <TextField
-          data-test-id="cartValue"
-          id="outlined-basic"
-          type="number"
-          label="Cart Value"
-          value={cartValue}
-          variant="outlined"
-          margin="normal"
-          onChange={(event) => setCartValue(parseFloat(event.target.value))}
-        />
-        <TextField
-          data-test-id="deliveryDistance"
-          id="outlined-basic"
-          type="number"
-          label="Delivery distance"
-          value={deliveryDistance}
-          variant="outlined"
-          margin="normal"
-          onChange={(event) =>
-            setDeliveryDistance(parseInt(event.target.value))
-          }
-        />
-        <TextField
-          data-test-id="numberOfItems"
-          id="outlined-basic"
-          type="number"
-          label="Number of items"
-          value={items}
-          variant="outlined"
-          margin="normal"
-          onChange={(event) => setItems(parseInt(event.target.value))}
-        />
+        <FormControl sx={{ width: "100%" }}>
+          <InputLabel>Cart value</InputLabel>
+          <OutlinedInput
+            data-test-id="cartValue"
+            type="number"
+            startAdornment={<InputAdornment position="start">€</InputAdornment>}
+            value={cartValue}
+            label="Cart value"
+            onChange={(event) => setCartValue(parseFloat(event.target.value))}
+          />
+        </FormControl>
+
+        <FormControl sx={{ width: "100%" }}>
+          <InputLabel>Delivery distance in meters</InputLabel>
+          <OutlinedInput
+            data-test-id="deliveryDistance"
+            id="outlined-basic"
+            type="number"
+            value={deliveryDistance}
+            label="Cart Delivery distance in meters"
+            onChange={(event) =>
+              setDeliveryDistance(parseInt(event.target.value))
+            }
+          />
+        </FormControl>
+
+        <FormControl sx={{ width: "100%" }}>
+          <InputLabel>Number of items</InputLabel>
+          <OutlinedInput
+            data-test-id="numberOfItems"
+            id="outlined-basic"
+            type="number"
+            value={items}
+            label="Number of items"
+            onChange={(event) => setItems(parseInt(event.target.value))}
+          />
+        </FormControl>
 
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker
+            sx={{ width: "100%" }}
+            label="Order time"
             value={pickerDateTime}
             onChange={(newDateTime) => setPickerDateTime(newDateTime)}
           />
         </LocalizationProvider>
 
-        <Button onClick={handleDeliveryFee}>Calculate delivery price</Button>
-        <Button onClick={handleClearCalculator}>Clear Calculator</Button>
-        {!!finalDeliveryFeePrice && (
+        <Button
+          variant="contained"
+          sx={{
+            bgcolor: "#00c2e8",
+            width: "100%",
+          }}
+          size="small"
+          onClick={handleDeliveryFee}
+        >
+          Calculate delivery price
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            bgcolor: "#00c2e8",
+            width: "100%",
+          }}
+          size="small"
+          onClick={handleClearCalculator}
+        >
+          Clear Calculator
+        </Button>
+        {finalDeliveryFeePrice && (
           <Typography data-test-id="fee">
             Delivery price: {finalDeliveryFeePrice}$
           </Typography>
