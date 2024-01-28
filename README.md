@@ -11,9 +11,9 @@ This is a Code Challenge for Wolt Software Engineer Intern (Frontend) Program. T
 - MUI
 - Jest
 
-## How to run in localhost
+## How to run in the development mode.
 
-Runs the app in the development mode.
+run `npm start` on your terminal
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
