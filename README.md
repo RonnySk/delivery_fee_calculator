@@ -13,6 +13,8 @@ This is a Code Challenge for Wolt Software Engineer Intern (Frontend) Program. T
 
 ## How to run in the development mode.
 
+run `npm install` to install as the dependencies
+
 run `npm start` on your terminal
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.

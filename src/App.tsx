@@ -4,12 +4,12 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
+  Stack,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { getDeliveryFee } from "./helpers/getDeliveryFee";
@@ -19,7 +19,7 @@ function App() {
   const [deliveryDistance, setDeliveryDistance] = useState(0);
   const [items, setItems] = useState(0);
   const [pickerDateTime, setPickerDateTime] = useState<Dayjs | null>(dayjs());
-  const [finalDeliveryFeePrice, setFinalDeliveryFeePrice] = useState<number>();
+  const [finalDeliveryFeePrice, setFinalDeliveryFeePrice] = useState(0);
 
   function handleDeliveryFee() {
     setFinalDeliveryFeePrice(
@@ -31,10 +31,8 @@ function App() {
     setCartValue(0);
     setDeliveryDistance(0);
     setItems(0);
-    setFinalDeliveryFeePrice(undefined);
+    setFinalDeliveryFeePrice(0);
   }
-
-  console.log("final delivery fee", finalDeliveryFeePrice);
 
   return (
     <Box
@@ -50,19 +48,8 @@ function App() {
         Delivery Fee Calculator
       </Typography>
 
-      <Box
-        bgcolor="#ffffff"
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        border={1}
-        borderColor="#ffffff"
-        borderRadius={4}
-        p={6}
-        gap={3}
-      >
-        <FormControl sx={{ width: "100%" }}>
+      <Stack bgcolor="#ffffff" borderRadius={4} p={6} spacing={3}>
+        <FormControl fullWidth>
           <InputLabel>Cart value</InputLabel>
           <OutlinedInput
             data-test-id="cartValue"
@@ -74,21 +61,21 @@ function App() {
           />
         </FormControl>
 
-        <FormControl sx={{ width: "100%" }}>
+        <FormControl fullWidth>
           <InputLabel>Delivery distance in meters</InputLabel>
           <OutlinedInput
             data-test-id="deliveryDistance"
             id="outlined-basic"
             type="number"
             value={deliveryDistance}
-            label="Cart Delivery distance in meters"
+            label="Delivery distance in meters"
             onChange={(event) =>
               setDeliveryDistance(parseInt(event.target.value))
             }
           />
         </FormControl>
 
-        <FormControl sx={{ width: "100%" }}>
+        <FormControl fullWidth>
           <InputLabel>Number of items</InputLabel>
           <OutlinedInput
             data-test-id="numberOfItems"
@@ -104,42 +91,38 @@ function App() {
           <DateTimePicker
             sx={{ width: "100%" }}
             label="Order time"
+            data-test-id="orderTime"
             value={pickerDateTime}
             onChange={(newDateTime) => setPickerDateTime(newDateTime)}
           />
         </LocalizationProvider>
 
         <Button
+          fullWidth
           variant="contained"
-          sx={{
-            bgcolor: "#00c2e8",
-            width: "100%",
-          }}
+          sx={{ bgcolor: "#00c2e8" }}
           size="small"
           onClick={handleDeliveryFee}
         >
           Calculate delivery price
         </Button>
         <Button
+          fullWidth
           variant="contained"
-          sx={{
-            bgcolor: "#00c2e8",
-            width: "100%",
-          }}
+          sx={{ bgcolor: "#00c2e8" }}
           size="small"
           onClick={handleClearCalculator}
         >
           Clear Calculator
         </Button>
-        {finalDeliveryFeePrice && (
-          <Typography data-test-id="fee">
-            Delivery price: {finalDeliveryFeePrice}$
+        <Typography textAlign="center" display="inline-block">
+          Delivery price:
+          <Typography data-test-id="fee" display="inline-block" mx={1}>
+            {finalDeliveryFeePrice}
           </Typography>
-        )}
-        {finalDeliveryFeePrice === 0 && (
-          <Typography>Free Delivery Fee!</Typography>
-        )}
-      </Box>
+          €
+        </Typography>
+      </Stack>
     </Box>
   );
 }
