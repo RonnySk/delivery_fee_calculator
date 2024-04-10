@@ -1,8 +1,8 @@
-# Wolt Delivery Fee Calculator
+# Delivery Fee Calculator
 
 ## About
 
-This is a Code Challenge for Wolt Software Engineer Intern (Frontend) Program. The Task was to develop a delivery fee calculator app which calculates a delivery fee based on user input and shows the calculated delivery fee to the user.
+Exercise to develop a delivery fee calculator app which calculates a delivery fee based on user input and shows the calculated delivery fee to the user.
 
 ## Technologies
 
